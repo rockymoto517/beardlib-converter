@@ -1,0 +1,4 @@
+<event name="setup">
+            <track source="stealthPart" weight="10"/>
+            <track source="altStealthPart" weight="weight_chance"/>
+        </event>

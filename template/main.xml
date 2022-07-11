@@ -1,0 +1,9 @@
+<table name="sample_id">
+    <Localization directory="loc" default="en.txt"/>
+    <HeistMusic id="sample_id" directory="sounds">
+        <event name="setup" source="stealthPart"/>
+        <event name="anticipation" source="anticipationPart"/>
+        <event name="assault" source="assaultPart"/>
+        <event name="control" source="controlPart"/>
+    </HeistMusic>
+</table>

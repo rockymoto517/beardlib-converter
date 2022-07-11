@@ -1,0 +1,4 @@
+<event name="anticipation">
+            <track source="anticipationPart" weight="10"/>
+            <track source="altAnticipationPart" weight="weight_chance"/>
+        </event>
