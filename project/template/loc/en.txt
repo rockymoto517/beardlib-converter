@@ -1,0 +1,4 @@
+{
+    "menu_jukebox_sample_id" : "sample_name",
+    "menu_jukebox_screen_sample_id" : "sample_name"
+}

@@ -1,0 +1,41 @@
+{
+    "id": "inno_glitched",
+    "volume": 1,
+    "name": "Innocence Glitched",
+    "fade_duration": 0.9,
+    "context": "heist",
+    "events": {
+        "setup": {
+            "file": "setup.ogg",
+
+            "volume": 1,
+            "fade_in": 1,
+            "fade_out": 1
+        },
+        "control" : {
+            "file": "control.ogg",
+
+            "volume": 1,
+            "fade_in": 1,
+            "fade_out": 1
+        },
+        "buildup": {
+            "file": "buildup.ogg",
+
+            "volume": 1,
+            "fade_in": 1,
+            "fade_out": 1
+        },
+        "assault" : {
+            "start_file": "start_assault.ogg",
+            "file": "assault.ogg",
+
+            "alt": "alt_assault.ogg",
+            "alt_chance": 0.1,
+
+            "volume": 1,
+            "fade_in": 0.3,
+            "fade_out": 1
+        }
+    }
+}
