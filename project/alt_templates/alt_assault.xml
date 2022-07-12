@@ -1,4 +1,4 @@
 <event name="assault">
-            <track source="assaultPart" weight="10"/>
-            <track source="altAssaultPart" weight="weight_chance"/>
+            <track source="assaultPart"/>
+            <track source="altAssaultPart"/>
         </event>

@@ -15,6 +15,9 @@ namespace rj = rapidjson;
 
 Converter::Converter(std::string ost, std::string dst):
 	destination(dst), original(ost) {
+	readJson(original);
+	name = track["name"].GetString();
+	id = track["id"].GetString();
 }
 
 void Converter::copyDir() {
@@ -24,7 +27,7 @@ void Converter::copyDir() {
     catch (std::exception& e) {std::cout << e.what();}
 }
 
-rj::Document Converter::readJson(std::string folder) {
+void Converter::readJson(std::string folder) {
 	try {
 		std::ifstream file(folder);	
 		char buffer[4096];
@@ -34,19 +37,17 @@ rj::Document Converter::readJson(std::string folder) {
 			i++;
 		file.close();
 
-		rj::Document d;
-		d.Parse(buffer);
-		return d;
+		track.Parse(buffer);
 	}
 
 	catch (std::exception& e) {
 		std::cout << e.what() << std::endl;
-		return NULL;
 	}
 }
 
-void Converter::locRewrite(std::string file, std::string mid, std::string name) {
+void Converter::locRewrite(std::string file) {
 	try{
+		std::cout << "Preparing to rewrite localization file..." << std::endl;
 		std::ifstream readfile(file);
 		std::string fstring;
 		std::ostringstream sstr;
@@ -55,7 +56,7 @@ void Converter::locRewrite(std::string file, std::string mid, std::string name) 
 		fstring = sstr.str();
 		readfile.close();
 
-		fstring = std::regex_replace(fstring, std::regex("sample_id"), mid);
+		fstring = std::regex_replace(fstring, std::regex("sample_id"), id);
 		fstring = std::regex_replace(fstring, std::regex("sample_name"), name);
 
 		std::ofstream outfile(file);
@@ -124,18 +125,19 @@ void Converter::soundsRewrite(std::string file, std::string trackpath, std::stri
 }
 */
 
-void Converter::altSoundsRewrite(std::string file, std::string trackpath, std::string mid, std::vector<bool> alts) {
+void Converter::altSoundsRewrite(std::string file, std::vector<bool> alts) {
 	try {
+		std::cout << "Preparing to rewrite xml..." << std::endl;
 		std::ifstream readfile(file);
 		std::string fstring;
 		std::ostringstream sstr;
-		rj::Document track = readJson(trackpath);
 
 		sstr << readfile.rdbuf();
 		readfile.close();
 		fstring = sstr.str();
 
 		//Adding the alt parts before editing
+		std::cout << "Checking alt tracks..." << std::endl;
 		for (size_t i = 0; i < alts.size(); i++) {
 			if (alts.at(i)) {
 				if (i == 0) {
@@ -181,6 +183,7 @@ void Converter::altSoundsRewrite(std::string file, std::string trackpath, std::s
 			}			
 		}
 
+		std::cout << "Replacing xml..." << std::endl;
 		for (auto& m : track["events"].GetObject()) {
 			std::ostringstream sstream;
 			std::string ss;
@@ -233,12 +236,12 @@ void Converter::altSoundsRewrite(std::string file, std::string trackpath, std::s
 			}
 		}
 
+		std::cout << "Writing xml..." << std::endl;
 		fstring = std::regex_replace(fstring, std::regex("sample_id"), track["id"].GetString());
-
-		std::cout << fstring << std::endl;
 		std::ofstream outfile(file);
 		outfile << fstring;
 		outfile.close();
+		std::cout << "Successfuly wrote xml..." << std::endl;
 	}
 
 	catch (std::exception& e) {
@@ -246,8 +249,7 @@ void Converter::altSoundsRewrite(std::string file, std::string trackpath, std::s
 	}
 }
 
-std::vector<bool> Converter::checkAlts(std::string trackpath) {
-	rj::Document track = readJson(trackpath);
+std::vector<bool> Converter::checkAlts() {
 	std::vector<bool> alts;
 
 	for (rj::Value::ConstMemberIterator itr = track["events"].MemberBegin();
@@ -262,9 +264,8 @@ std::vector<bool> Converter::checkAlts(std::string trackpath) {
 	return alts;
 }
 
-void Converter::copySongs(std::string folder, std::string trackpath, std::string dst) {
+void Converter::copySongs(std::string folder, std::string dst) {
 	std::vector<std::string> names;
-	rj::Document track = readJson(trackpath);
 
 	for (auto& m : track["events"].GetObject()) {
 		assert(m.value.IsObject());

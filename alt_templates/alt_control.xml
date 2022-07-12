@@ -1,4 +1,4 @@
 <event name="control">
-            <track source="controlPart" weight="10"/>
-            <track source="altControlPart" weight="weight_chance"/>
+            <track source="controlPart"/>
+            <track source="altControlPart"/>
         </event>
