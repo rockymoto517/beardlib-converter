@@ -26,8 +26,6 @@ int main(int argc, char* argv[]) {
         converter.locRewrite(loc);
         converter.altSoundsRewrite(mxml, converter.checkAlts());
         converter.copySongs(folder, output);
-        std::cout << "Successfuly Converted." << std::endl <<
-        "Press any key to exit...";
-        std::cin.get();
+        std::cout << "Successfuly Converted." << std::endl;
     }
 }
