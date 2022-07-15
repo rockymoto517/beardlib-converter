@@ -1,4 +1,0 @@
-<event name="anticipation">
-            <track source="anticipationPart"/>
-            <track source="altAnticipationPart"/>
-        </event>

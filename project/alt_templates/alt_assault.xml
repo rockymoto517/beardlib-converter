@@ -1,4 +1,0 @@
-<event name="assault">
-            <track source="assaultPart"/>
-            <track source="altAssaultPart"/>
-        </event>

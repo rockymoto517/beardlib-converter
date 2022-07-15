@@ -1,4 +1,0 @@
-<event name="setup">
-            <track source="stealthPart"/>
-            <track source="altStealthPart"/>
-        </event>

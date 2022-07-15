@@ -1,4 +1,0 @@
-<event name="control">
-            <track source="controlPart"/>
-            <track source="altControlPart"/>
-        </event>

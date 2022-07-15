@@ -5,7 +5,9 @@
 #include <filesystem>
 #include <sstream>
 #include <regex>
+#include <cstdio>
 #include "Converter.h"
+#include "rapidjson/filereadstream.h"
 #include "rapidjson/writer.h"
 #include "rapidjson/document.h"
 #include "rapidjson/stringbuffer.h"
@@ -14,14 +16,19 @@ namespace fs = std::filesystem;
 namespace rj = rapidjson;
 
 Converter::Converter(std::string ost, std::string dst):
-	destination(dst), original(ost) {
+	original(ost), destination(dst) {
 	readJson(original);
+	assert(track.IsObject());
 	name = track["name"].GetString();
 	id = track["id"].GetString();
 }
 
-void Converter::copyDir() {
+void Converter::copyDir(bool is_recursive) {
 	try {
+		if (is_recursive) {
+			std::string pre_destination = destination.substr(0, destination.find('\\'));
+			fs::create_directory(pre_destination);
+		}
         fs::copy(SOURCE, destination, fs::copy_options::overwrite_existing | fs::copy_options::recursive);
     }
     catch (std::exception& e) {std::cout << e.what();}
@@ -29,15 +36,12 @@ void Converter::copyDir() {
 
 void Converter::readJson(std::string folder) {
 	try {
-		std::ifstream file(folder);	
-		char buffer[4096];
-		int i = 0;
+		FILE* in = fopen(folder.c_str(), "rb");	
+		char buffer[65536];
+		rj::FileReadStream stream(in, buffer, sizeof(buffer));
 
-		while (file >> buffer[i])
-			i++;
-		file.close();
-
-		track.Parse(buffer);
+		track.ParseStream(stream);
+		fclose(in);
 	}
 
 	catch (std::exception& e) {
@@ -47,7 +51,6 @@ void Converter::readJson(std::string folder) {
 
 void Converter::locRewrite(std::string file) {
 	try{
-		std::cout << "Preparing to rewrite localization file..." << std::endl;
 		std::ifstream readfile(file);
 		std::string fstring;
 		std::ostringstream sstr;
@@ -127,7 +130,6 @@ void Converter::soundsRewrite(std::string file, std::string trackpath, std::stri
 
 void Converter::altSoundsRewrite(std::string file, std::vector<bool> alts) {
 	try {
-		std::cout << "Preparing to rewrite xml..." << std::endl;
 		std::ifstream readfile(file);
 		std::string fstring;
 		std::ostringstream sstr;
@@ -137,7 +139,6 @@ void Converter::altSoundsRewrite(std::string file, std::vector<bool> alts) {
 		fstring = sstr.str();
 
 		//Adding the alt parts before editing
-		std::cout << "Checking alt tracks..." << std::endl;
 		for (size_t i = 0; i < alts.size(); i++) {
 			if (alts.at(i)) {
 				if (i == 0) {
@@ -183,7 +184,6 @@ void Converter::altSoundsRewrite(std::string file, std::vector<bool> alts) {
 			}			
 		}
 
-		std::cout << "Replacing xml..." << std::endl;
 		for (auto& m : track["events"].GetObject()) {
 			std::ostringstream sstream;
 			std::string ss;
@@ -236,12 +236,10 @@ void Converter::altSoundsRewrite(std::string file, std::vector<bool> alts) {
 			}
 		}
 
-		std::cout << "Writing xml..." << std::endl;
 		fstring = std::regex_replace(fstring, std::regex("sample_id"), track["id"].GetString());
 		std::ofstream outfile(file);
 		outfile << fstring;
 		outfile.close();
-		std::cout << "Successfuly wrote xml..." << std::endl;
 	}
 
 	catch (std::exception& e) {
@@ -251,10 +249,8 @@ void Converter::altSoundsRewrite(std::string file, std::vector<bool> alts) {
 
 std::vector<bool> Converter::checkAlts() {
 	std::vector<bool> alts;
-
 	for (rj::Value::ConstMemberIterator itr = track["events"].MemberBegin();
 			itr != track["events"].MemberEnd(); ++itr) {
-
 			if (itr->value.HasMember("alt"))
 				alts.push_back(true);
 			else
@@ -281,11 +277,29 @@ void Converter::copySongs(std::string folder, std::string dst) {
 		std::ostringstream outputs;
 		std::string srcs;
 		std::string dsts;
-		inputs << folder << "/" << names.at(i);
-		outputs << dst << "/sounds/" << names.at(i);
+		inputs << folder << "\\" << names.at(i);
+		outputs << dst << "\\sounds\\" << names.at(i);
 		srcs = inputs.str();
 		dsts = outputs.str();
-		std::cout << srcs << " : " << dsts << std::endl;
 		std::filesystem::copy(srcs, dsts);
 	}
+}
+
+int Converter::callEdits(std::string in, std::string out, bool is_recursive) {
+	std::string loc = out + "\\loc\\en.txt";
+	std::string mxml = out + "\\main.xml";
+	if (!is_recursive) std::cout << "Copying directory..." << std::endl;
+	copyDir(is_recursive);
+	if (!is_recursive) std::cout << "Copied directory.\n" << std::endl <<
+	"Rewriting localization..." << std::endl;
+	locRewrite(loc);
+	if (!is_recursive) std::cout << "Rewrote localization file.\n" << std::endl <<
+	"Rewriting xml..." << std::endl;
+	altSoundsRewrite(mxml, checkAlts());
+	if (!is_recursive) std::cout << "Rewrote xml.\n" << std::endl <<
+	"Copying songs..." << std::endl;
+	copySongs(in, out);
+	if (!is_recursive) std::cout << "Copied songs.\n" << std::endl;
+	std::cout << "Successfuly Converted " << track["name"].GetString() << "." << std::endl;
+	return 0;
 }
