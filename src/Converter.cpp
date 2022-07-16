@@ -6,6 +6,7 @@
 #include <sstream>
 #include <regex>
 #include <cstdio>
+#include <algorithm>
 #include "Converter.h"
 #include "rapidjson/filereadstream.h"
 #include "rapidjson/writer.h"
@@ -262,14 +263,20 @@ std::vector<bool> Converter::checkAlts() {
 
 void Converter::copySongs(std::string folder, std::string dst) {
 	std::vector<std::string> names;
+	std::string current_title;
 
 	for (auto& m : track["events"].GetObject()) {
 		assert(m.value.IsObject());
 		if (m.value.HasMember("alt"))
-			names.push_back(m.value["alt"].GetString());
+			if (!std::count(names.begin(), names.end(), m.value["alt"].GetString()))
+				names.push_back(m.value["alt"].GetString());
+
 		if (m.value.HasMember("start_file"))
-			names.push_back(m.value["start_file"].GetString());
-		names.push_back(m.value["file"].GetString());
+			if (!std::count(names.begin(), names.end(), m.value["start_file"].GetString()))
+				names.push_back(m.value["start_file"].GetString());
+				
+		if (!std::count(names.begin(), names.end(), m.value["file"].GetString()))
+			names.push_back(m.value["file"].GetString());
 	}
 
 	for(size_t i = 0; i < names.size(); i++) {
