@@ -7,6 +7,12 @@ Make sure that the output folder hasn't been created, the tool will create the f
 3. Drag and drop a customOST song into the Converter folder
 4. Write into the command line: Converter folder_name output_folder_name
 
+## CMake
+
+1. Create a build directory
+2. cmake ../ and build
+3. Move the executable to the parent folder
+
 ### To convert an entire folder
 
 1. Create a new folder and drop the songs you want to convert inside there

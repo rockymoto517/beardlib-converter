@@ -140,6 +140,7 @@ void Converter::altSoundsRewrite(std::string file, std::vector<bool> alts) {
 		fstring = sstr.str();
 
 		//Adding the alt parts before editing
+		std::size_t index = 0;
 		for (size_t i = 0; i < alts.size(); i++) {
 			if (alts.at(i)) {
 				if (i == 0) {
@@ -148,7 +149,6 @@ void Converter::altSoundsRewrite(std::string file, std::vector<bool> alts) {
 					rstream << replacementFile.rdbuf();
 					replacementFile.close();
 					std::string replacement = rstream.str(); 
-					std::size_t index = 0;
 					index = fstring.find("<event name=\"setup\" source=\"stealthPart\"/>", index);
 					fstring.replace(index, 43, replacement);
 				}
@@ -158,7 +158,6 @@ void Converter::altSoundsRewrite(std::string file, std::vector<bool> alts) {
 					rstream << replacementFile.rdbuf();
 					replacementFile.close();
 					std::string replacement = rstream.str();
-					std::size_t index = 0;
 					index = fstring.find("<event name=\"control\" source=\"controlPart\"/>", index);
 					fstring.replace(index, 45, replacement);
 				}
@@ -168,7 +167,6 @@ void Converter::altSoundsRewrite(std::string file, std::vector<bool> alts) {
 					rstream << replacementFile.rdbuf();
 					replacementFile.close();
 					std::string replacement = rstream.str();
-					std::size_t index = 0;
 					index = fstring.find("<event name=\"anticipation\" source=\"anticipationPart\"/>", index);
 					fstring.replace(index, 55, replacement);
 				}
@@ -178,7 +176,6 @@ void Converter::altSoundsRewrite(std::string file, std::vector<bool> alts) {
 					rstream << replacementFile.rdbuf();
 					replacementFile.close();
 					std::string replacement = rstream.str();
-					std::size_t index = 0;
 					index = fstring.find("<event name=\"assault\" source=\"assaultPart\"/>", index);
 					fstring.replace(index, 45, replacement);
 				}
@@ -297,16 +294,16 @@ int Converter::callEdits(std::string in, std::string out, bool is_recursive) {
 	std::string mxml = out + "\\main.xml";
 	if (!is_recursive) std::cout << "Copying directory..." << std::endl;
 	copyDir(is_recursive);
-	if (!is_recursive) std::cout << "Copied directory.\n" << std::endl <<
+	if (!is_recursive) std::cout << "Copied directory." << std::endl <<
 	"Rewriting localization..." << std::endl;
 	locRewrite(loc);
-	if (!is_recursive) std::cout << "Rewrote localization file.\n" << std::endl <<
+	if (!is_recursive) std::cout << "Rewrote localization file." << std::endl <<
 	"Rewriting xml..." << std::endl;
 	altSoundsRewrite(mxml, checkAlts());
-	if (!is_recursive) std::cout << "Rewrote xml.\n" << std::endl <<
+	if (!is_recursive) std::cout << "Rewrote xml." << std::endl <<
 	"Copying songs..." << std::endl;
 	copySongs(in, out);
-	if (!is_recursive) std::cout << "Copied songs.\n" << std::endl;
-	std::cout << "Successfuly Converted " << track["name"].GetString() << "." << std::endl;
+	if (!is_recursive) std::cout << "Copied songs." << std::endl;
+	std::cout << "Successfuly Converted " << track["name"].GetString() << ".\n" << std::endl;
 	return 0;
 }
