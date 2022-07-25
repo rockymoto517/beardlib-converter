@@ -1,6 +1,7 @@
 #include <string>
 #include <fstream>
 #include <vector>
+#include <iostream>
 #include "rapidjson/document.h"
 
 class Converter {

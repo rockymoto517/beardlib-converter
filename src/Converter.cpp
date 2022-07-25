@@ -19,7 +19,7 @@ namespace rj = rapidjson;
 Converter::Converter(std::string ost, std::string dst):
 	original(ost), destination(dst) {
 	readJson(original);
-	assert(track.IsObject());
+	assert(("JSON Reading error: Please fix the formatting of the track.txt file.", track.IsObject()));
 	name = track["name"].GetString();
 	id = track["id"].GetString();
 }
@@ -32,7 +32,7 @@ void Converter::copyDir(bool is_recursive) {
 		}
         fs::copy(SOURCE, destination, fs::copy_options::overwrite_existing | fs::copy_options::recursive);
     }
-    catch (std::exception& e) {std::cout << e.what();}
+    catch (std::exception& e) {std::cout << "File copying error." << std::endl;}
 }
 
 void Converter::readJson(std::string folder) {
@@ -46,7 +46,7 @@ void Converter::readJson(std::string folder) {
 	}
 
 	catch (std::exception& e) {
-		std::cout << e.what() << std::endl;
+		std::cout << "JSON Reading error: Please fix the formatting of the track.txt file." << std::endl;
 	}
 }
 
