@@ -23,9 +23,9 @@ int main(int argc, char* argv[]) {
                 std::string output(argv[3]);
                 int backPos = name.find("\\");
                 std::string folder = name.substr(backPos + 1);
-                const std::string track_extension("\\track.txt");
+                const std::string track_extension("/track.txt");
                 name.append(track_extension);
-                output.append("\\");
+                output.append("/");
                 output.append(folder);
 
                 Converter*converter = new Converter(name, output);
@@ -44,7 +44,7 @@ int main(int argc, char* argv[]) {
     }
     else {
         std::string track = argv[1];
-        track.append("\\track.txt");
+        track.append("/track.txt");
         Converter*converter = new Converter(track, argv[2]);
         int result = converter->callEdits(argv[1], argv[2], false);
         delete converter;

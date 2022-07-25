@@ -15,5 +15,7 @@ add_executable(Converter
 ADD_LIBRARY(libs
     src/Converter.cpp)
 
+target_compile_definitions(libs PUBLIC RESOURCE_DIRECTORY="${CMAKE_CURRENT_SOURCE_DIR}/")
+
 target_link_libraries(libs ${RapidJSON})
 target_link_libraries(Converter libs)

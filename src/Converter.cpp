@@ -18,10 +18,12 @@ namespace rj = rapidjson;
 
 Converter::Converter(std::string ost, std::string dst):
 	original(ost), destination(dst) {
-	readJson(original);
+	bool success = readJson(original);
+	if (success) {
 	assert(("JSON Reading error: Please fix the formatting of the track.txt file.", track.IsObject()));
 	name = track["name"].GetString();
 	id = track["id"].GetString();
+	}
 }
 
 void Converter::copyDir(bool is_recursive) {
@@ -35,18 +37,26 @@ void Converter::copyDir(bool is_recursive) {
     catch (std::exception& e) {std::cout << "File copying error." << std::endl;}
 }
 
-void Converter::readJson(std::string folder) {
+bool Converter::readJson(std::string folder) {
 	try {
 		FILE* in = fopen(folder.c_str(), "rb");	
+		if (in == 0) { 
+			std::cout << "File could not be read." << std::endl;
+			return false;
+		}
+		else {
 		char buffer[65536];
 		rj::FileReadStream stream(in, buffer, sizeof(buffer));
 
 		track.ParseStream(stream);
+		}
 		fclose(in);
+		return true;
 	}
 
 	catch (std::exception& e) {
 		std::cout << "JSON Reading error: Please fix the formatting of the track.txt file." << std::endl;
+		return false;
 	}
 }
 
@@ -247,14 +257,12 @@ void Converter::altSoundsRewrite(std::string file, std::vector<bool> alts) {
 
 std::vector<bool> Converter::checkAlts() {
 	std::vector<bool> alts;
-	for (rj::Value::ConstMemberIterator itr = track["events"].MemberBegin();
-			itr != track["events"].MemberEnd(); ++itr) {
-			if (itr->value.HasMember("alt"))
-				alts.push_back(true);
-			else
-				alts.push_back(false);
-		}
-	
+	for (auto& itr : track["events"].GetObject()) {
+		if (itr.value.HasMember("alt"))
+			alts.push_back(true);
+		else
+			alts.push_back(false);
+	}
 	return alts;
 }
 
@@ -281,8 +289,8 @@ void Converter::copySongs(std::string folder, std::string dst) {
 		std::ostringstream outputs;
 		std::string srcs;
 		std::string dsts;
-		inputs << folder << "\\" << names.at(i);
-		outputs << dst << "\\sounds\\" << names.at(i);
+		inputs << SOURCE_DIR << folder << "/" << names.at(i);
+		outputs << SOURCE_DIR << dst << "/sounds/" << names.at(i);
 		srcs = inputs.str();
 		dsts = outputs.str();
 		std::filesystem::copy(srcs, dsts);
