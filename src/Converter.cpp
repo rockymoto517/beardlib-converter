@@ -16,13 +16,13 @@
 namespace fs = std::filesystem;
 namespace rj = rapidjson;
 
-Converter::Converter(std::string ost, std::string dst):
-	original(ost), destination(dst) {
+Converter::Converter(std::string ost, std::string dst, const char* _SEPARATOR):
+	original(ost), destination(dst), SEPARATOR(_SEPARATOR) {
 	bool success = readJson(original);
 	if (success) {
-	assert(("JSON Reading error: Please fix the formatting of the track.txt file.", track.IsObject()));
-	name = track["name"].GetString();
-	id = track["id"].GetString();
+		assert(("JSON Reading error: Please fix the formatting of the track.txt file.", track.IsObject()));
+		name = track["name"].GetString();
+		id = track["id"].GetString();
 	}
 }
 
@@ -289,8 +289,8 @@ void Converter::copySongs(std::string folder, std::string dst) {
 		std::ostringstream outputs;
 		std::string srcs;
 		std::string dsts;
-		inputs << SOURCE_DIR << folder << "/" << names.at(i);
-		outputs << SOURCE_DIR << dst << "/sounds/" << names.at(i);
+		inputs << SOURCE_DIR << folder << SEPARATOR << names.at(i);
+		outputs << SOURCE_DIR << dst << SEPARATOR << "sounds" << SEPARATOR << names.at(i);
 		srcs = inputs.str();
 		dsts = outputs.str();
 		std::filesystem::copy(srcs, dsts);
@@ -298,8 +298,8 @@ void Converter::copySongs(std::string folder, std::string dst) {
 }
 
 int Converter::callEdits(std::string in, std::string out, bool is_recursive) {
-	std::string loc = out + "\\loc\\en.txt";
-	std::string mxml = out + "\\main.xml";
+	std::string loc = out + SEPARATOR + "loc" + SEPARATOR + "en.txt";
+	std::string mxml = out + SEPARATOR + "main.xml";
 	if (!is_recursive) std::cout << "Copying directory..." << std::endl;
 	copyDir(is_recursive);
 	if (!is_recursive) std::cout << "Copied directory." << std::endl <<

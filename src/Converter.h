@@ -7,11 +7,11 @@ class Converter {
 	private:
 		const std::string SOURCE = "template";
 		const std::string SOURCE_DIR = RESOURCE_DIRECTORY;
-		std::string original, destination, name, id;
+		std::string original, destination, name, id, SEPARATOR;
 		rapidjson::Document track;
 
 	public:
-		Converter(std::string ost, std::string dst);
+		Converter(std::string ost, std::string dst, const char* _SEPARATOR);
 		void copyDir(bool is_recursive);
 		bool readJson(std::string folder);
 		void locRewrite(std::string file);

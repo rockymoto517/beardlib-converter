@@ -5,6 +5,14 @@
 #include "rapidjson/document.h"
 #include "Converter.h"
 
+#ifdef _WIN32
+#define SEPARATOR "\\"
+#endif
+
+#ifdef linux
+#define SEPARATOR "/"
+#endif
+
 namespace fs = std::filesystem;
 
 int main(int argc, char* argv[]) {
@@ -18,17 +26,19 @@ int main(int argc, char* argv[]) {
         fs::path parent(argv[2]);
         std::regex pattern("track.txt");
         for (auto& file: fs::recursive_directory_iterator(parent)) {
-            std::string name = file.path().string();
+            std::string name = fs::path(file).make_preferred().string();
             if (!(std::string::npos != name.find('.'))) {
                 std::string output(argv[3]);
                 int backPos = name.find("\\");
                 std::string folder = name.substr(backPos + 1);
-                const std::string track_extension("/track.txt");
+                std::string _extension(SEPARATOR);
+                _extension += "track.txt";
+                const std::string track_extension(_extension);
                 name.append(track_extension);
-                output.append("/");
+                output.append(SEPARATOR);
                 output.append(folder);
 
-                Converter*converter = new Converter(name, output);
+                Converter*converter = new Converter(name, output, SEPARATOR);
                 name = name.substr(0, name.size() - track_extension.size());
                 if (result == 0) 
                     result += converter->callEdits(name, output, true);
@@ -44,8 +54,10 @@ int main(int argc, char* argv[]) {
     }
     else {
         std::string track = argv[1];
-        track.append("/track.txt");
-        Converter*converter = new Converter(track, argv[2]);
+        std::string _extension(SEPARATOR);
+        _extension += "track.txt";
+        track.append(_extension);
+        Converter*converter = new Converter(track, argv[2], SEPARATOR);
         int result = converter->callEdits(argv[1], argv[2], false);
         delete converter;
         return result;
