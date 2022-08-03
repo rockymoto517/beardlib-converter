@@ -29,17 +29,17 @@ int main(int argc, char* argv[]) {
             std::string name = fs::path(file).make_preferred().string();
             if (!(std::string::npos != name.find('.'))) {
                 std::string output(argv[3]);
-                int backPos = name.find("\\");
+                int backPos = name.find(SEPARATOR);
                 std::string folder = name.substr(backPos + 1);
                 std::string _extension(SEPARATOR);
-                _extension += "track.txt";
-                const std::string track_extension(_extension);
-                name.append(track_extension);
-                output.append(SEPARATOR);
-                output.append(folder);
+                            _extension += "track.txt";
+                            name += _extension;
+                            output += SEPARATOR;
+                            output += folder;
 
                 Converter*converter = new Converter(name, output, SEPARATOR);
-                name = name.substr(0, name.size() - track_extension.size());
+                name = name.substr(0, name.size() - _extension.size());
+
                 if (result == 0) 
                     result += converter->callEdits(name, output, true);
                 delete converter;
@@ -48,19 +48,23 @@ int main(int argc, char* argv[]) {
         return result;
     }
     else if (strcmp(argv[1], "-h") == 0 || strcmp(argv[1], "-help") == 0) {
-        std::cout << "To convert 1 folder: Converter input_folder output_folder." << std::endl <<
-        "-r:    Recursive search and convert in folder." << std::endl;
+        std::cout << "To convert 1 folder: Converter input_folder output_folder.\n" <<
+        "-r:    Recursive search and convert in folder.\n";
         return 0;
     }
-    else {
+    else if (argc == 2) {
         std::string track = argv[1];
         std::string _extension(SEPARATOR);
-        _extension += "track.txt";
-        track.append(_extension);
+                    _extension += "track.txt";
+                    track += _extension;
+
         Converter*converter = new Converter(track, argv[2], SEPARATOR);
         int result = converter->callEdits(argv[1], argv[2], false);
+
         delete converter;
         return result;
     }
+    std::cout << "Please enter a valid argument.\n" <<
+                  "For help, use the - h flag.\n\n";
     return 1;
 }

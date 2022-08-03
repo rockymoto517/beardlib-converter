@@ -1,5 +1,4 @@
 #include <string>
-#include <fstream>
 #include <vector>
 #include "rapidjson/document.h"
 
@@ -15,7 +14,6 @@ class Converter {
 		void copyDir(bool is_recursive);
 		bool readJson(std::string folder);
 		void locRewrite(std::string file);
-		//void soundsRewrite(std::string file, std::string trackpath, std::string mid);
 		void altSoundsRewrite(std::string file, std::vector<bool> alts);
 		std::vector<bool> checkAlts();
 		void copySongs(std::string folder, std::string dst);

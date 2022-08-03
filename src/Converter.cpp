@@ -29,19 +29,19 @@ Converter::Converter(std::string ost, std::string dst, const char* _SEPARATOR):
 void Converter::copyDir(bool is_recursive) {
 	try {
 		if (is_recursive) {
-			std::string pre_destination = destination.substr(0, destination.find('\\'));
+			std::string pre_destination = destination.substr(0, destination.find(SEPARATOR));
 			fs::create_directory(pre_destination);
 		}
         fs::copy(SOURCE, destination, fs::copy_options::overwrite_existing | fs::copy_options::recursive);
     }
-    catch (std::exception& e) {std::cout << "File copying error." << std::endl;}
+    catch (std::exception& e) {std::cout << "File copying error.\n";}
 }
 
 bool Converter::readJson(std::string folder) {
 	try {
 		FILE* in = fopen(folder.c_str(), "rb");	
 		if (in == 0) { 
-			std::cout << "File could not be read." << std::endl;
+			std::cout << "File could not be read.\n";
 			return false;
 		}
 		else {
@@ -55,7 +55,7 @@ bool Converter::readJson(std::string folder) {
 	}
 
 	catch (std::exception& e) {
-		std::cout << "JSON Reading error: Please fix the formatting of the track.txt file." << std::endl;
+		std::cout << "JSON Reading error: Please fix the formatting of the track.txt file.\n";
 		return false;
 	}
 }
@@ -79,65 +79,9 @@ void Converter::locRewrite(std::string file) {
 	}
 
 	catch (std::exception& e) {
-		std::cout << e.what() << std::endl;
+		std::cout << e.what() << "\n";
 	}
 }
-
-/* Legacy
-void Converter::soundsRewrite(std::string file, std::string trackpath, std::string mid) {
-	try {
-		std::ifstream readfile(file);
-		std::string fstring;
-		std::ostringstream sstr;
-		rj::Document track = readJson(trackpath);
-
-		sstr << readfile.rdbuf();
-		readfile.close();
-		fstring = sstr.str();
-
-		for (rj::Value::ConstMemberIterator itr = track["events"].MemberBegin();
-			itr != track["events"].MemberEnd(); ++itr) {
-
-			std::ostringstream sstream;
-			std::string ss;
-			std::string part = itr->name.GetString();
-			sstream << itr->value["file"].GetString();
-
-			if (itr->value.HasMember("start_file")) {
-				sstream << "\" start_source=\"" << itr->value["start_file"].GetString();
-				ss = sstream.str();
-				if (part == "setup")
-					fstring = std::regex_replace(fstring, std::regex("stealthPart"), ss);
-				else if (part == "control")
-					fstring = std::regex_replace(fstring, std::regex("controlPart"), ss);
-				else if (part == "buildup")
-					fstring = std::regex_replace(fstring, std::regex("anticipationPart"), ss);
-				else
-					fstring = std::regex_replace(fstring, std::regex("assaultPart"), ss);
-			}
-			else {
-				ss = sstream.str();
-				if (part == "setup")
-					fstring = std::regex_replace(fstring, std::regex("stealthPart"), ss);
-				else if (part == "control")
-					fstring = std::regex_replace(fstring, std::regex("controlPart"), ss);
-				else if (part == "buildup")
-					fstring = std::regex_replace(fstring, std::regex("anticipationPart"), ss);
-				else
-					fstring = std::regex_replace(fstring, std::regex("assaultPart"), ss);
-			}			
-		}
-		
-		std::ofstream outfile(file);
-		outfile << fstring;
-		outfile.close();
-	}
-
-	catch (std::exception& e) {
-		std::cout << e.what() << std::endl;
-	}
-}
-*/
 
 void Converter::altSoundsRewrite(std::string file, std::vector<bool> alts) {
 	try {
@@ -193,53 +137,46 @@ void Converter::altSoundsRewrite(std::string file, std::vector<bool> alts) {
 		}
 
 		for (auto& m : track["events"].GetObject()) {
-			std::ostringstream sstream;
-			std::string ss;
+			std::string xmltag = m.value["file"].GetString();
 			std::string part = m.name.GetString();
-			sstream << m.value["file"].GetString();
 
 
 			if (m.value.HasMember("start_file")) {
 				assert(m.value.IsObject());
-				sstream << "\" start_source=\"" << m.value["start_file"].GetString();
-				ss = sstream.str();
+				xmltag += "\" start_source=\"";
+				xmltag += m.value["start_file"].GetString();
 				if (part == "setup")
-					fstring = std::regex_replace(fstring, std::regex("stealthPart"), ss);
+					fstring = std::regex_replace(fstring, std::regex("stealthPart"), xmltag);
 				else if (part == "control")
-					fstring = std::regex_replace(fstring, std::regex("controlPart"), ss);
+					fstring = std::regex_replace(fstring, std::regex("controlPart"), xmltag);
 				else if (part == "buildup")
-					fstring = std::regex_replace(fstring, std::regex("anticipationPart"), ss);
+					fstring = std::regex_replace(fstring, std::regex("anticipationPart"), xmltag);
 				else
-					fstring = std::regex_replace(fstring, std::regex("assaultPart"), ss);
+					fstring = std::regex_replace(fstring, std::regex("assaultPart"), xmltag);
 			}
 			else {
-				ss = sstream.str();
 				if (part == "setup")
-					fstring = std::regex_replace(fstring, std::regex("stealthPart"), ss);
+					fstring = std::regex_replace(fstring, std::regex("stealthPart"), xmltag);
 				else if (part == "control")
-					fstring = std::regex_replace(fstring, std::regex("controlPart"), ss);
+					fstring = std::regex_replace(fstring, std::regex("controlPart"), xmltag);
 				else if (part == "buildup")
-					fstring = std::regex_replace(fstring, std::regex("anticipationPart"), ss);
+					fstring = std::regex_replace(fstring, std::regex("anticipationPart"), xmltag);
 				else
-					fstring = std::regex_replace(fstring, std::regex("assaultPart"), ss);
+					fstring = std::regex_replace(fstring, std::regex("assaultPart"), xmltag);
 			}
 			if (m.value.HasMember("alt")) {
-				std::ostringstream temps;
-				std::string alts;
-				assert(m.value.IsObject());
-				temps << m.value["alt"].GetString();
-				alts = temps.str();
+				std::string alttag = m.value["alt"].GetString();
 				if (part == "setup" && alts.at(0)) {
-					fstring = std::regex_replace(fstring, std::regex("altStealthPart"), alts);
+					fstring = std::regex_replace(fstring, std::regex("altStealthPart"), alttag);
 				}
 				else if (part == "control" && alts.at(1)) {
-					fstring = std::regex_replace(fstring, std::regex("altControlPart"), alts);
+					fstring = std::regex_replace(fstring, std::regex("altControlPart"), alttag);
 				}
 				else if (part == "anticipation" && alts.at(2)) {
-					fstring = std::regex_replace(fstring, std::regex("altAnticipationPart"), alts);
+					fstring = std::regex_replace(fstring, std::regex("altAnticipationPart"), alttag);
 				}
 				else if (part == "assault" && alts.at(3)) {
-					fstring = std::regex_replace(fstring, std::regex("altAssaultPart"), alts);
+					fstring = std::regex_replace(fstring, std::regex("altAssaultPart"), alttag);
 				}
 			}
 		}
@@ -285,33 +222,42 @@ void Converter::copySongs(std::string folder, std::string dst) {
 	}
 
 	for(size_t i = 0; i < names.size(); i++) {
-		std::ostringstream inputs;
-		std::ostringstream outputs;
-		std::string srcs;
-		std::string dsts;
-		inputs << SOURCE_DIR << folder << SEPARATOR << names.at(i);
-		outputs << SOURCE_DIR << dst << SEPARATOR << "sounds" << SEPARATOR << names.at(i);
-		srcs = inputs.str();
-		dsts = outputs.str();
+		std::string srcs(SOURCE_DIR);
+					srcs += folder;
+					srcs += SEPARATOR;
+					srcs += names.at(i);
+		std::string dsts(SOURCE_DIR);
+					dsts += dst;
+					dsts += SEPARATOR;
+					dsts += "sounds";
+					dsts += SEPARATOR;
+					dsts += names.at(i);
 		std::filesystem::copy(srcs, dsts);
 	}
+
+	std::string _remove_file = dst;
+				_remove_file += SEPARATOR;
+				_remove_file += "sounds";
+				_remove_file += SEPARATOR;
+				_remove_file += ".gitkeep";
+	std::filesystem::remove(_remove_file);
 }
 
 int Converter::callEdits(std::string in, std::string out, bool is_recursive) {
 	std::string loc = out + SEPARATOR + "loc" + SEPARATOR + "en.txt";
 	std::string mxml = out + SEPARATOR + "main.xml";
-	if (!is_recursive) std::cout << "Copying directory..." << std::endl;
+	if (!is_recursive) std::cout << "Copying directory...\n";
 	copyDir(is_recursive);
-	if (!is_recursive) std::cout << "Copied directory." << std::endl <<
-	"Rewriting localization..." << std::endl;
+	if (!is_recursive) std::cout << "Copied directory.\n" <<
+	"Rewriting localization...\n";
 	locRewrite(loc);
-	if (!is_recursive) std::cout << "Rewrote localization file." << std::endl <<
-	"Rewriting xml..." << std::endl;
+	if (!is_recursive) std::cout << "Rewrote localization file.\n" <<
+	"Rewriting xml...\n";
 	altSoundsRewrite(mxml, checkAlts());
-	if (!is_recursive) std::cout << "Rewrote xml." << std::endl <<
-	"Copying songs..." << std::endl;
+	if (!is_recursive) std::cout << "Rewrote xml.\n" <<
+	"Copying songs...\n";
 	copySongs(in, out);
-	if (!is_recursive) std::cout << "Copied songs." << std::endl;
-	std::cout << "Successfuly Converted " << track["name"].GetString() << ".\n" << std::endl;
+	if (!is_recursive) std::cout << "Copied songs.\n";
+	std::cout << "Successfuly Converted " << track["name"].GetString() << ".\n\n";
 	return 0;
 }

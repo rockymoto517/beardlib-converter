@@ -11,7 +11,6 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
-
 #ifndef RAPIDJSON_DOCUMENT_H_
 #define RAPIDJSON_DOCUMENT_H_
 
@@ -1930,6 +1929,8 @@ private:
     RAPIDJSON_FORCEINLINE Member* GetMembersPointer() const { return RAPIDJSON_GETPOINTER(Member, data_.o.members); }
     RAPIDJSON_FORCEINLINE Member* SetMembersPointer(Member* members) { return RAPIDJSON_SETPOINTER(Member, data_.o.members, members); }
 
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wclass-memaccess"
     // Initialize this value as array with initial data, without calling destructor.
     void SetArrayRaw(GenericValue* values, SizeType count, Allocator& allocator) {
         data_.f.flags = kArrayFlag;
@@ -1955,6 +1956,7 @@ private:
             SetMembersPointer(0);
         data_.o.size = data_.o.capacity = count;
     }
+    #pragma GCC diagnostic pop
 
     //! Initialize this value as constant string, without calling destructor.
     void SetStringRaw(StringRefType s) RAPIDJSON_NOEXCEPT {
