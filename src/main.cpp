@@ -2,6 +2,7 @@
 #include <string>
 #include <filesystem>
 #include <regex>
+#include <memory>
 #include "rapidjson/document.h"
 #include "Converter.h"
 
@@ -36,25 +37,23 @@ int main(int argc, char* argv[]) {
                             output += SEPARATOR;
                             output += folder;
 
-                Converter*converter = new Converter(name, output, SEPARATOR);
+                std::unique_ptr<Converter> converter = std::make_unique<Converter>(name, output, SEPARATOR);
                 if (converter->trackExists()) {
                     name = name.substr(0, name.size() - _extension.size());
                     converter->callEdits(name, output, true);
-
-                    delete converter;
                 }
                 else {
-                    std::cout << "Error reading " << name << ".\nPlease try validating the json file.\n\n";
+                    std::cout << "Error reading " << name << 
+                                 ".\nPlease try validating the json file.\n\n";
                     return 1;
                 }
-                delete converter;
             }
         }
         return 0;
     }
     else if (strcmp(argv[1], "-h") == 0 || strcmp(argv[1], "-help") == 0) {
         std::cout << "To convert 1 folder: Converter input_folder output_folder.\n" <<
-        "-r:    Recursive search and convert in folder.\n";
+                     "-r:    Recursive search and convert in folder.\n";
         return 0;
     }
     else if (argc == 3) {
@@ -63,18 +62,14 @@ int main(int argc, char* argv[]) {
                     _extension += "track.txt";
                     track += _extension;
 
-        Converter*converter = new Converter(track, argv[2], SEPARATOR);
+        std::unique_ptr<Converter> converter = std::make_unique<Converter>(track, argv[2], SEPARATOR);
         if (converter->trackExists()) {
             converter->callEdits(argv[1], argv[2], false);
-
-            delete converter;
             return 0;
         }
-
-        delete converter;
         return 1;
     }
     std::cout << "Please enter a valid argument.\n" <<
-                  "For help, use the - h flag.\n\n";
+                 "For help, use the - h flag.\n\n";
     return 1;
 }

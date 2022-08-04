@@ -16,7 +16,7 @@
 namespace fs = std::filesystem;
 namespace rj = rapidjson;
 
-Converter::Converter(std::string ost, std::string dst, const char* _SEPARATOR):
+Converter::Converter(const std::string ost, const std::string dst, const char* _SEPARATOR):
 	original(ost), destination(dst), SEPARATOR(_SEPARATOR) {
 	bool success = readJson(original);
 	if (trackExists()) {
@@ -25,7 +25,7 @@ Converter::Converter(std::string ost, std::string dst, const char* _SEPARATOR):
 	}
 }
 
-void Converter::copyDir(bool is_recursive) {
+void Converter::copyDir(const bool is_recursive) {
 	try {
 		if (is_recursive) {
 			std::string pre_destination = destination.substr(0, destination.find(SEPARATOR));
@@ -36,7 +36,7 @@ void Converter::copyDir(bool is_recursive) {
     catch (std::exception& e) {std::cout << "File copying error.\n";}
 }
 
-bool Converter::readJson(std::string folder) {
+bool Converter::readJson(const std::string folder) {
 	try {
 		FILE* in = fopen(folder.c_str(), "rb");	
 		if (in == 0) { 
@@ -59,7 +59,7 @@ bool Converter::readJson(std::string folder) {
 	}
 }
 
-void Converter::locRewrite(std::string file) {
+void Converter::locRewrite(const std::string file) {
 	try{
 		std::ifstream readfile(file);
 		std::string fstring;
@@ -82,7 +82,7 @@ void Converter::locRewrite(std::string file) {
 	}
 }
 
-void Converter::altSoundsRewrite(std::string file, std::vector<bool> alts) {
+void Converter::altSoundsRewrite(const std::string file, const std::vector<bool> alts) {
 	try {
 		std::ifstream readfile(file);
 		std::string fstring;
@@ -202,7 +202,7 @@ std::vector<bool> Converter::checkAlts() {
 	return alts;
 }
 
-void Converter::copySongs(std::string folder, std::string dst) {
+void Converter::copySongs(const std::string folder, const std::string dst) {
 	std::vector<std::string> names;
 	std::string current_title;
 
@@ -242,7 +242,7 @@ void Converter::copySongs(std::string folder, std::string dst) {
 	fs::remove(_remove_file);
 }
 
-void Converter::callEdits(std::string in, std::string out, bool is_recursive) {
+void Converter::callEdits(const std::string in, const std::string out, const bool is_recursive) {
 	std::string loc = out + 
 					  SEPARATOR + 
 					  "loc" + 

@@ -11,14 +11,14 @@ class Converter {
 		rapidjson::Document track;
 
 	public:
-		Converter(std::string ost, std::string dst, const char* _SEPARATOR);
-		void copyDir(bool is_recursive);
-		bool readJson(std::string folder);
-		void locRewrite(std::string file);
-		void altSoundsRewrite(std::string file, std::vector<bool> alts);
+		Converter(const std::string ost, const std::string dst, const char* _SEPARATOR);
+		void copyDir(const bool is_recursive);
+		bool readJson(const std::string folder);
+		void locRewrite(const std::string file);
+		void altSoundsRewrite(const std::string file, const std::vector<bool> alts);
 		std::vector<bool> checkAlts();
-		void copySongs(std::string folder, std::string dst);
-		void callEdits(std::string in, std::string out, bool is_recursive);
-		void logMsg(std::string msg, int time, std::string relation);
+		void copySongs(const std::string folder, const std::string dst);
+		void callEdits(const std::string in, const std::string out, const bool is_recursive);
+		void logMsg(const std::string msg, const int time, const std::string relation);
 		bool trackExists() {return track.IsObject();}
 };
