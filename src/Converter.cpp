@@ -268,5 +268,5 @@ void Converter::callEdits(std::string in, std::string out, bool is_recursive) {
 	copySongs(in, out);
 
 	if (!is_recursive) std::cout << "Copied songs.\n";
-	std::cout << "Successfuly Converted " << track["name"].GetString() << ".\n\n";
+	std::cout << "Successfuly Converted " << track["name"].GetString() << ".\n";
 }

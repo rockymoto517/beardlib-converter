@@ -25,11 +25,11 @@ int main(int argc, char* argv[]) {
         const fs::path parent{argv[2]};
         std::regex pattern("track.txt");
         for (auto const& file: fs::directory_iterator{parent}) {
-            std::string name = fs::path(file).make_preferred().string();
+            std::string name = fs::path(file).make_preferred().string();            
             if (!(std::string::npos != name.find('.'))) {
-                std::string output(argv[3]);
                 int backPos = name.find(SEPARATOR);
                 std::string folder = name.substr(backPos + 1);
+                std::string output(argv[3]);
                 std::string _extension(SEPARATOR);
                             _extension += "track.txt";
                             name += _extension;
@@ -42,7 +42,7 @@ int main(int argc, char* argv[]) {
                     converter->callEdits(name, output, true);
 
                     delete converter;
-                } 
+                }
                 else {
                     std::cout << "Error reading " << name << ".\nPlease try validating the json file.\n\n";
                     return 1;
