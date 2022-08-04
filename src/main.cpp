@@ -22,10 +22,9 @@ int main(int argc, char* argv[]) {
     } 
     else if (std::strcmp(argv[1], "-r") == 0) {
         int result = 0;
-        std::smatch m;
-        fs::path parent(argv[2]);
+        const fs::path parent{argv[2]};
         std::regex pattern("track.txt");
-        for (auto& file: fs::recursive_directory_iterator(parent)) {
+        for (auto const& file: fs::directory_iterator{parent}) {
             std::string name = fs::path(file).make_preferred().string();
             if (!(std::string::npos != name.find('.'))) {
                 std::string output(argv[3]);
@@ -38,31 +37,42 @@ int main(int argc, char* argv[]) {
                             output += folder;
 
                 Converter*converter = new Converter(name, output, SEPARATOR);
-                name = name.substr(0, name.size() - _extension.size());
+                if (converter->trackExists()) {
+                    name = name.substr(0, name.size() - _extension.size());
+                    converter->callEdits(name, output, true);
 
-                if (result == 0) 
-                    result += converter->callEdits(name, output, true);
+                    delete converter;
+                } 
+                else {
+                    std::cout << "Error reading " << name << ".\nPlease try validating the json file.\n\n";
+                    return 1;
+                }
                 delete converter;
             }
         }
-        return result;
+        return 0;
     }
     else if (strcmp(argv[1], "-h") == 0 || strcmp(argv[1], "-help") == 0) {
         std::cout << "To convert 1 folder: Converter input_folder output_folder.\n" <<
         "-r:    Recursive search and convert in folder.\n";
         return 0;
     }
-    else if (argc == 2) {
+    else if (argc == 3) {
         std::string track = argv[1];
         std::string _extension(SEPARATOR);
                     _extension += "track.txt";
                     track += _extension;
 
         Converter*converter = new Converter(track, argv[2], SEPARATOR);
-        int result = converter->callEdits(argv[1], argv[2], false);
+        if (converter->trackExists()) {
+            converter->callEdits(argv[1], argv[2], false);
+
+            delete converter;
+            return 0;
+        }
 
         delete converter;
-        return result;
+        return 1;
     }
     std::cout << "Please enter a valid argument.\n" <<
                   "For help, use the - h flag.\n\n";

@@ -19,8 +19,7 @@ namespace rj = rapidjson;
 Converter::Converter(std::string ost, std::string dst, const char* _SEPARATOR):
 	original(ost), destination(dst), SEPARATOR(_SEPARATOR) {
 	bool success = readJson(original);
-	if (success) {
-		assert(("JSON Reading error: Please fix the formatting of the track.txt file.", track.IsObject()));
+	if (trackExists()) {
 		name = track["name"].GetString();
 		id = track["id"].GetString();
 	}
@@ -96,7 +95,7 @@ void Converter::altSoundsRewrite(std::string file, std::vector<bool> alts) {
 		//Adding the alt parts before editing
 		std::size_t index = 0;
 		for (size_t i = 0; i < alts.size(); i++) {
-			if (alts.at(i)) {
+			if (alts[i]) {
 				if (i == 0) {
 					std::ifstream replacementFile("alt_templates/alt_setup.xml");
 					std::ostringstream rstream;
@@ -166,16 +165,16 @@ void Converter::altSoundsRewrite(std::string file, std::vector<bool> alts) {
 			}
 			if (m.value.HasMember("alt")) {
 				std::string alttag = m.value["alt"].GetString();
-				if (part == "setup" && alts.at(0)) {
+				if (part == "setup" && alts[0]) {
 					fstring = std::regex_replace(fstring, std::regex("altStealthPart"), alttag);
 				}
-				else if (part == "control" && alts.at(1)) {
+				else if (part == "control" && alts[1]) {
 					fstring = std::regex_replace(fstring, std::regex("altControlPart"), alttag);
 				}
-				else if (part == "anticipation" && alts.at(2)) {
+				else if (part == "anticipation" && alts[2]) {
 					fstring = std::regex_replace(fstring, std::regex("altAnticipationPart"), alttag);
 				}
-				else if (part == "assault" && alts.at(3)) {
+				else if (part == "assault" && alts[3]) {
 					fstring = std::regex_replace(fstring, std::regex("altAssaultPart"), alttag);
 				}
 			}
@@ -225,39 +224,49 @@ void Converter::copySongs(std::string folder, std::string dst) {
 		std::string srcs(SOURCE_DIR);
 					srcs += folder;
 					srcs += SEPARATOR;
-					srcs += names.at(i);
+					srcs += names[i];
 		std::string dsts(SOURCE_DIR);
 					dsts += dst;
 					dsts += SEPARATOR;
 					dsts += "sounds";
 					dsts += SEPARATOR;
-					dsts += names.at(i);
-		std::filesystem::copy(srcs, dsts);
+					dsts += names[i];
+		fs::copy(srcs, dsts);
 	}
 
 	std::string _remove_file = dst;
-				_remove_file += SEPARATOR;
-				_remove_file += "sounds";
-				_remove_file += SEPARATOR;
-				_remove_file += ".gitkeep";
-	std::filesystem::remove(_remove_file);
+				_remove_file += SEPARATOR +
+								"sounds" +
+								SEPARATOR +
+								".gitkeep";
+	fs::remove(_remove_file);
 }
 
-int Converter::callEdits(std::string in, std::string out, bool is_recursive) {
-	std::string loc = out + SEPARATOR + "loc" + SEPARATOR + "en.txt";
-	std::string mxml = out + SEPARATOR + "main.xml";
+void Converter::callEdits(std::string in, std::string out, bool is_recursive) {
+	std::string loc = out + 
+					  SEPARATOR + 
+					  "loc" + 
+					  SEPARATOR + 
+					  "en.txt";
+	std::string mxml = out + 
+					   SEPARATOR + 
+					   "main.xml";
+
 	if (!is_recursive) std::cout << "Copying directory...\n";
 	copyDir(is_recursive);
+
 	if (!is_recursive) std::cout << "Copied directory.\n" <<
 	"Rewriting localization...\n";
 	locRewrite(loc);
+
 	if (!is_recursive) std::cout << "Rewrote localization file.\n" <<
 	"Rewriting xml...\n";
 	altSoundsRewrite(mxml, checkAlts());
+
 	if (!is_recursive) std::cout << "Rewrote xml.\n" <<
 	"Copying songs...\n";
 	copySongs(in, out);
+
 	if (!is_recursive) std::cout << "Copied songs.\n";
 	std::cout << "Successfuly Converted " << track["name"].GetString() << ".\n\n";
-	return 0;
 }

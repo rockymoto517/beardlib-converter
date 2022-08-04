@@ -1,3 +1,4 @@
+#pragma once
 #include <string>
 #include <vector>
 #include "rapidjson/document.h"
@@ -17,6 +18,7 @@ class Converter {
 		void altSoundsRewrite(std::string file, std::vector<bool> alts);
 		std::vector<bool> checkAlts();
 		void copySongs(std::string folder, std::string dst);
-		int callEdits(std::string in, std::string out, bool is_recursive);
+		void callEdits(std::string in, std::string out, bool is_recursive);
 		void logMsg(std::string msg, int time, std::string relation);
+		bool trackExists() {return track.IsObject();}
 };
