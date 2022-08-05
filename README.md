@@ -10,13 +10,16 @@ Make sure that the output folder hasn't been created, the tool will create the f
 ## CMake
 
 1. Create a build directory
-2. cmake ../ and build
-3. Move the executable to the parent folder
+2. cd into it
+3. cmake ../ && make (if you're using mingw, use cmake ../ -G "MinGW Makefiles" && make)
+4. Move the executable to the parent folder
 
 ### To convert an entire folder
 
 1. Create a new folder and drop the songs you want to convert inside there
-2. Write: Converter -r folder_with_multiple_folders output_folder_name
+2. I've included a recursive_tests folder to use. 
+3. Write: Converter -r recursive_tests output_folder
 
 #### Troubleshooting
-You'll get assertion errors if the track.txt is written in improper json, so if you get an error, try validating the json
+You'll get errors if the track.txt is written in improper json.
+The program may not be able to find all folders when doing a recursive conversion if the folder names have spaces or special characters.
