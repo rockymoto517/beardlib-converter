@@ -14,4 +14,6 @@ set(SOURCES src/main.cpp
 include_directories("${CMAKE_BINARY_DIR}/Include")
 add_executable(Converter ${SOURCES})
 
+target_precompile_headers(Converter PRIVATE src/headers.h)
+
 target_compile_definitions(Converter PUBLIC RESOURCE_DIRECTORY="${CMAKE_CURRENT_SOURCE_DIR}/")

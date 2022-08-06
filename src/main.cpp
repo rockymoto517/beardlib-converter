@@ -1,9 +1,4 @@
-#include <filesystem>
-#include <iostream>
-#include <memory>
-#include <regex>
-#include <string>
-#include <rapidjson/document.h>
+#include "headers.h"
 #include "Converter.h"
 
 #ifdef _WIN32
@@ -37,10 +32,10 @@ int main(int argc, char* argv[]) {
                             output += SEPARATOR;
                             output += folder;
 
-                std::unique_ptr<Converter> converter = std::make_unique<Converter>(name, output, SEPARATOR);
-                if (converter->trackExists()) {
+                Converter converter = Converter(name, output, SEPARATOR);
+                if (converter.trackExists()) {
                     name = name.substr(0, name.size() - _extension.size());
-                    converter->callEdits(name, output, true);
+                    converter.callEdits(name, output, true);
                 }
                 else {
                     std::cout << "Error reading " << name << 
@@ -62,9 +57,9 @@ int main(int argc, char* argv[]) {
                     _extension += "track.txt";
                     track += _extension;
 
-        std::unique_ptr<Converter> converter = std::make_unique<Converter>(track, argv[2], SEPARATOR);
-        if (converter->trackExists()) {
-            converter->callEdits(argv[1], argv[2], false);
+        Converter converter = Converter(track, argv[2], SEPARATOR);
+        if (converter.trackExists()) {
+            converter.callEdits(argv[1], argv[2], false);
             return 0;
         }
         return 1;

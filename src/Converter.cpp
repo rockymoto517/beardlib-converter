@@ -1,22 +1,10 @@
-#include <algorithm>
-#include <cstdio>
-#include <filesystem>
-#include <fstream>
-#include <iostream>
-#include <regex>
-#include <sstream>
-#include <string>
-#include <vector>
-#include <rapidjson/filereadstream.h>
-#include <rapidjson/stringbuffer.h>
-#include <rapidjson/document.h>
-#include <rapidjson/writer.h>
+#include "headers.h"
 #include "Converter.h"
 
 namespace fs = std::filesystem;
 namespace rj = rapidjson;
 
-Converter::Converter(const std::string ost, const std::string dst, const char* _SEPARATOR):
+Converter::Converter(const std::string& ost, const std::string& dst, const char* _SEPARATOR):
 	original(ost), destination(dst), SEPARATOR(_SEPARATOR) {
 	bool success = readJson(original);
 	if (trackExists() && success) { //Make sure the track.txt is actually read
@@ -36,7 +24,7 @@ void Converter::copyDir(const bool is_recursive) {
     catch (std::exception& e) {std::cout << "File copying error.\n";}
 }
 
-bool Converter::readJson(const std::string folder) {
+bool Converter::readJson(const std::string& folder) {
 	try { //Open the track.txt and parse it as a file stream
 		FILE* in = fopen(folder.c_str(), "rb");	
 		if (in == 0) { 
@@ -59,7 +47,7 @@ bool Converter::readJson(const std::string folder) {
 	}
 }
 
-void Converter::locRewrite(const std::string file) {
+void Converter::locRewrite(const std::string& file) {
 	try{
 		std::ifstream readfile(file); //Read the en.txt with an input stream
 		std::string fstring;
@@ -82,7 +70,7 @@ void Converter::locRewrite(const std::string file) {
 	}
 }
 
-void Converter::altSoundsRewrite(const std::string file, const std::vector<bool> alts) {
+void Converter::altSoundsRewrite(const std::string& file, const std::vector<bool>& alts) {
 	try {
 		std::ifstream readfile(file); //Read the main.xml with an input stream
 		std::string fstring;
@@ -190,7 +178,7 @@ void Converter::altSoundsRewrite(const std::string file, const std::vector<bool>
 	}
 }
 
-std::vector<bool> Converter::checkAlts() {
+std::vector<bool> Converter::checkAlts() const {
 	std::vector<bool> alts;
 	for (auto& itr : track["events"].GetObject()) { //Finding alts in track.txt
 		if (itr.value.HasMember("alt"))
@@ -201,7 +189,7 @@ std::vector<bool> Converter::checkAlts() {
 	return alts;
 }
 
-void Converter::copySongs(const std::string folder, const std::string dst) {
+void Converter::copySongs(const std::string& folder, const std::string& dst) {
 	std::vector<std::string> names; //Cache tracks
 
 	for (auto& m : track["events"].GetObject()) {
@@ -239,7 +227,7 @@ void Converter::copySongs(const std::string folder, const std::string dst) {
 	fs::remove(_remove_file); //Remove empty file (used so github creates a proper folder)
 }
 
-void Converter::callEdits(const std::string in, const std::string out, const bool is_recursive) {
+void Converter::callEdits(const std::string& in, const std::string& out, const bool is_recursive) {
 	std::string loc = out + 
 					  SEPARATOR + 
 					  "loc" + 

@@ -3,3 +3,4 @@ template/*
 alt_templates/*
 recursive_tests/*
 Include/*
+build/*
