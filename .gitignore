@@ -1,6 +1,4 @@
-Converter.exe
-template/*
-alt_templates/*
-recursive_tests/*
-Include/*
 build/*
+test/*
+TODO
+.cache/*
