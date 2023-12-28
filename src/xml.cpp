@@ -6,9 +6,9 @@ XML::XML(Track &track, const std::string &dest) : file(dest + "/main.xml") {
     replace_id(track.id);
 
     for (const auto &[event, fileName] : track.events) {
-        if (track.alts.contains(event)) {
+        if (track.alts.contains(event)) [[unlikely]] {
             add_alt_event(event, track);
-        } else {
+        } else [[likely]] {
             add_event(event, track);
         }
     }

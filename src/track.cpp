@@ -24,9 +24,9 @@ void Track::set(const std::string &trackFile) {
     this->events["control"] = trackData["events"]["control"]["file"];
 
     for (auto &[event, part] : trackData["events"].items()) {
-        if (part.contains("alt")) {
+        if (part.contains("alt")) [[unlikely]] {
             this->alts[event] = {part["alt"], 0};
-            if (part.contains("alt_chance")) {
+            if (part.contains("alt_chance")) [[likely]] {
                 this->alts[event].second = part["alt_chance"];
             }
         }
@@ -35,7 +35,7 @@ void Track::set(const std::string &trackFile) {
             this->starts[event] = part["start_file"];
         }
 
-        if (part.contains("alt_start")) {
+        if (part.contains("alt_start")) [[unlikely]] {
             this->altStarts[event] = part["alt_start"];
         }
     }

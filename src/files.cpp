@@ -33,7 +33,8 @@ void create_loc(Track &track, const std::string &output) {
 
 void copy_files(const fs::path &inDir, const fs::path &soundsDir) {
     for (const auto &file : fs::directory_iterator(inDir)) {
-        if (file.path().string().find("track.txt") == std::string::npos) {
+        if (file.path().string().find("track.txt") == std::string::npos)
+            [[unlikely]] {
             fs::copy_file(file,
                           soundsDir /
                               file.path().string().substr(
